@@ -5,6 +5,4 @@ import guru.springfamework.domain.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomerRepository extends JpaRepository<Customer,Long> {
-    CustomerDTO findByFirstName(String firstName);
-    CustomerDTO findByLastName(String lastName);
 }
