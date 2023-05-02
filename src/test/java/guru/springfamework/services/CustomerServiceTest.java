@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class CustomerServiceTest extends junit.framework.TestCase {
+public class CustomerServiceTest{
 
     private final static Long ID = 2l;
     private final static String NAME = "Jimmy";
