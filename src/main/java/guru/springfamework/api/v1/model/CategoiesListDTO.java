@@ -5,5 +5,5 @@ import java.util.List;
 @lombok.Data
 @lombok.AllArgsConstructor
 public class CategoiesListDTO {
-    List<CategoryDTO> categorys;
+    List<CategoryDTO> categories;
 }
