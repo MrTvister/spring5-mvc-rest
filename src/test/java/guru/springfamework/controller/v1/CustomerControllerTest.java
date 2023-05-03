@@ -15,13 +15,15 @@ import java.util.Arrays;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class CustomerControllerTest {
+public class CustomerControllerTest extends AbstractRestControllerTest{
 
     @Mock
     CustomerService customerService;
@@ -76,5 +78,72 @@ public class CustomerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName", equalTo("Michale")));
+    }
+
+    @Test
+    public void createNewCustomer() throws Exception{
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName("Jim");
+        customerDTO.setLastName("Ross");
+
+        CustomerDTO returnDTO = new CustomerDTO();
+        returnDTO.setLastName(customerDTO.getLastName());
+        returnDTO.setFirstName(customerDTO.getFirstName());
+        returnDTO.setCustomerURL("/api/v1/customers/1");
+
+        when(customerService.createNewCustomer(any(CustomerDTO.class))).thenReturn(returnDTO);
+
+        mockMvc.perform(post("/api/v1/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(customerDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.firstName",equalTo("Jim")))
+                .andExpect(jsonPath("$.customer_url",equalTo("/api/v1/customers/1")));
+    }
+    @Test
+    public void updateCustomerTest() throws Exception{
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName("Joe");
+        customerDTO.setLastName("Douw");
+
+        CustomerDTO returnCustomer = new CustomerDTO();
+        returnCustomer.setFirstName(customerDTO.getFirstName());
+        returnCustomer.setLastName(customerDTO.getLastName());
+        returnCustomer.setCustomerURL("/api/v1/customers/1");
+
+        when(customerService.saveCustomerByDTO(anyLong(), any(CustomerDTO.class)))
+                .thenReturn(returnCustomer);
+
+        mockMvc.perform(put("/api/v1/customers/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(customerDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName",equalTo("Joe")))
+                .andExpect(jsonPath("$.customer_url",equalTo("/api/v1/customers/1")));
+    }
+    @Test
+    public void testPatchCustomers() throws Exception{
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName("Joe");
+
+        CustomerDTO returnDTO = new CustomerDTO();
+        returnDTO.setFirstName(customerDTO.getFirstName());
+        returnDTO.setLastName("Return");
+        returnDTO.setCustomerURL("/api/v1/customer/1");
+        when(customerService.patchCustomer(anyLong(), any(CustomerDTO.class))).thenReturn(returnDTO);
+
+        mockMvc.perform(patch("/api/v1/customer/1")
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .content(asJsonString(customerDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName", equalTo("Joe")))
+                .andExpect(jsonPath("$.customer_url", equalTo("/api/v1/customer/1")));
+    }
+    @Test
+    public void testDeleteCustomerByID() throws Exception{
+        mockMvc.perform(delete("/api/v1/customer/1")
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        verify(customerService).deleteCustomerById(anyLong());
     }
 }
