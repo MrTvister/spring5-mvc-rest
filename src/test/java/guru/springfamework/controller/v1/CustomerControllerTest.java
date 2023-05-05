@@ -117,7 +117,7 @@ public class CustomerControllerTest extends AbstractRestControllerTest{
         mockMvc.perform(put("/api/v1/customers/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(customerDTO)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.firstName",equalTo("Joe")))
                 .andExpect(jsonPath("$.customer_url",equalTo("/api/v1/customers/1")));
     }
@@ -129,19 +129,19 @@ public class CustomerControllerTest extends AbstractRestControllerTest{
         CustomerDTO returnDTO = new CustomerDTO();
         returnDTO.setFirstName(customerDTO.getFirstName());
         returnDTO.setLastName("Return");
-        returnDTO.setCustomerURL("/api/v1/customer/1");
+        returnDTO.setCustomerURL("/api/v1/customers/1");
         when(customerService.patchCustomer(anyLong(), any(CustomerDTO.class))).thenReturn(returnDTO);
 
-        mockMvc.perform(patch("/api/v1/customer/1")
+        mockMvc.perform(patch("/api/v1/customers/1")
                 .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                 .content(asJsonString(customerDTO)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.firstName", equalTo("Joe")))
-                .andExpect(jsonPath("$.customer_url", equalTo("/api/v1/customer/1")));
+                .andExpect(jsonPath("$.customer_url", equalTo("/api/v1/customers/1")));
     }
     @Test
     public void testDeleteCustomerByID() throws Exception{
-        mockMvc.perform(delete("/api/v1/customer/1")
+        mockMvc.perform(delete("/api/v1/customers/1")
                 .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         verify(customerService).deleteCustomerById(anyLong());

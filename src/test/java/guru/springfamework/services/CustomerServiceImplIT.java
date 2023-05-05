@@ -6,6 +6,7 @@ import guru.springfamework.bootstrap.Bootstrap;
 import guru.springfamework.domain.Customer;
 import guru.springfamework.repositories.CategoryRepository;
 import guru.springfamework.repositories.CustomerRepository;
+import guru.springfamework.repositories.VendorRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,29 +27,31 @@ import static org.junit.Assert.assertThat;
 public class CustomerServiceImplIT {
     @Autowired
     CustomerRepository customerRepository;
-
+    @Autowired
+    VendorRepository vendorRepository;
     @Autowired
     CategoryRepository categoryRepository;
     CustomerService customerService;
 
     @Before
-    public void setUp() throws  Exception{
+    public void setUp() throws Exception {
         System.out.println("Loading Customer Data");
         System.out.println(customerRepository.findAll().size());
 
         //setup data for testing
-        Bootstrap bootstrap = new Bootstrap(categoryRepository, customerRepository);
+        Bootstrap bootstrap = new Bootstrap(categoryRepository, customerRepository, vendorRepository);
         bootstrap.run(); //load data
 
         customerService = new CustomerServiceImpl(customerRepository, CustomerMapper.INSTANCE);
     }
 
     @Test
-    public void patchCustomerUpdateFirstName(){
+    public void patchCustomerUpdateFirstName() {
 
     }
+
     @Test
-    public void patchCustomerUpdateLastName()throws Exception{
+    public void patchCustomerUpdateLastName() throws Exception {
         long id = getCustomerIdValue();
         Customer origin = customerRepository.getOne(id);
         org.junit.Assert.assertNotNull(origin);
@@ -67,12 +70,12 @@ public class CustomerServiceImplIT {
         assertThat(originLastName, equalTo(updateCustomer.getLastName()));
 
     }
-    private Long getCustomerIdValue(){
+
+    private Long getCustomerIdValue() {
         List<Customer> customerList = customerRepository.findAll();
         System.out.println(customerList.size());
         return customerList.get(0).getId();
     }
-
 
 
 }
